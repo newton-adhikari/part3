@@ -1,4 +1,13 @@
-delete http://localhost:3001/api/persons/3
+delete http://localhost:3001/api/persons/5
 
 ###
-get http://localhost:3001/api/persons/3
+get http://localhost:3001/api/persons/
+
+###
+post http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "dfka",
+    "number": "3432894"
+}
