@@ -42,6 +42,15 @@ app.post("/api/persons", (req, res) => {
         ? Math.max(...persons.map(p => p.id))
         : 0
     const uniqueId = id + 1;
+
+    if(!Object.keys(req.body).includes("name") || !Object.keys(req.body).includes("number")) {
+        return res.status(400).json({error: "name or number is missing"});
+    }
+
+    const {name} = req.body;
+    const existingUser = persons.find(p => p.name === name);
+    if(existingUser) return res.status(400).json({error: `${name} already exists`});
+
     const person = {id: uniqueId, ...req.body};
     persons = persons.concat(person);
     res.status(201).json(person);

@@ -8,6 +8,6 @@ post http://localhost:3001/api/persons
 content-type: application/json
 
 {
-    "name": "dfka",
-    "number": "3432894"
+    "name": "Arto Hellas",
+    "number": "53499832482"
 }
