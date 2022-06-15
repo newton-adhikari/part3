@@ -11,6 +11,7 @@
   "author": "Newton-ADK",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^8.17.0",
     "nodemon": "^2.0.16"
   },
   "dependencies": {
