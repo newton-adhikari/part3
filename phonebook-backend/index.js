@@ -93,6 +93,12 @@ app.post("/api/persons", (req, res) => {
     user.save().then(newUser => res.status(201).json(newUser));
 })
 
+app.put("/api/persons/:id", (req, res, next) => {
+    User.findByIdAndUpdate(req.params.id, req.body, {new: true})
+        .then(updatedUser => res.json(updatedUser))
+        .catch(err => next(err))
+})
+
 app.delete("/api/persons/:id", (req, res,next) => {
     // const id = Number(req.params.id);
     // const person = persons.find(p => p.id === id);
