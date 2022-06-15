@@ -50,22 +50,30 @@ app.get("/api/persons/:id", (req, res) => {
 })
 
 app.post("/api/persons", (req, res) => {
-    const id = persons.length > 0
-        ? Math.max(...persons.map(p => p.id))
-        : 0
-    const uniqueId = id + 1;
+    // const id = persons.length > 0
+    //     ? Math.max(...persons.map(p => p.id))
+    //     : 0
+    // const uniqueId = id + 1;
 
+    // if(!Object.keys(req.body).includes("name") || !Object.keys(req.body).includes("number")) {
+    //     return res.status(400).json({error: "name or number is missing"});
+    // }
+
+    // const {name} = req.body;
+    // const existingUser = persons.find(p => p.name === name);
+    // if(existingUser) return res.status(400).json({error: `${name} already exists`});
+
+    // const person = {id: uniqueId, ...req.body};
+    // persons = persons.concat(person);
+    // res.status(201).json(person);
+
+    if(!req.body) return res.status(400).json({error: "body is missing"});
     if(!Object.keys(req.body).includes("name") || !Object.keys(req.body).includes("number")) {
-        return res.status(400).json({error: "name or number is missing"});
+        return res.status(400).json({error: "name or number fields are missing"})
     }
-
-    const {name} = req.body;
-    const existingUser = persons.find(p => p.name === name);
-    if(existingUser) return res.status(400).json({error: `${name} already exists`});
-
-    const person = {id: uniqueId, ...req.body};
-    persons = persons.concat(person);
-    res.status(201).json(person);
+    const user = new User(req.body);
+    console.log(user);
+    user.save().then(newUser => res.status(201).json(newUser));
 })
 
 app.delete("/api/persons/:id", (req, res) => {
