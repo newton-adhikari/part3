@@ -113,10 +113,11 @@ app.delete("/api/persons/:id", (req, res,next) => {
 })
 
 app.get("/info", (req, res) => {
-    const response = `
-    <p>phonebook has info for ${persons.length} people</p>${new Date()}
-    `;
-    res.send(response);
+    User.find({})
+    .then(users => {
+        res.send(`<p>phonebook has info for ${users.length} people</p>${new Date()}`)
+    })
+    .catch(err => next(err))
 })
 
 app.use(errorHanlder);
