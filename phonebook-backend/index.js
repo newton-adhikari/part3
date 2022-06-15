@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/user");
+const { response } = require("express");
 
 morgan.token('body', req => {
     return JSON.stringify(req.body)
@@ -43,10 +44,17 @@ app.get("/api/persons", (req, res) => {
 })
 
 app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    const person = persons.find(p => p.id === id);
-    if(!person) return res.status(400).end();
-    res.json(person);
+    // const id = Number(req.params.id);
+    // const person = persons.find(p => p.id === id);
+    // if(!person) return res.status(400).end();
+    // res.json(person);
+
+    User.findById(req.params.id)
+        .then(user => {
+            if(!user) return res.status(400).json({error: "can't find the user"})
+            res.json(user);
+        })
+        .catch(err => res.status(500).json({error: err.message}))
 })
 
 app.post("/api/persons", (req, res) => {
@@ -77,12 +85,16 @@ app.post("/api/persons", (req, res) => {
 })
 
 app.delete("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    const person = persons.find(p => p.id === id);
+    // const id = Number(req.params.id);
+    // const person = persons.find(p => p.id === id);
 
-    if(!person) return res.status(400).end();
-    persons = persons.filter(p => p.id !== id);
-    res.end();
+    // if(!person) return res.status(400).end();
+    // persons = persons.filter(p => p.id !== id);
+    // res.end();
+
+    User.findByIdAndRemove(req.params.id)
+        .then(response => res.status(204).end())
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 app.get("/info", (req, res) => {
