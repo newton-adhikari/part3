@@ -8,7 +8,16 @@ const { response } = require("express");
 
 morgan.token('body', req => {
     return JSON.stringify(req.body)
-})  
+})
+
+const errorHanlder = (error, request, response, next) => {
+    console.log(error.message);
+
+    if(error.name === "CastError") {
+        return response.status(400).send("malformed id");
+    }
+    next(error);
+}
 
 app.use(express.static("build"));
 app.use(cors());
@@ -38,12 +47,13 @@ let persons = [
     }
 ];
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (req, res, next) => {
     User.find({})
-        .then(users => res.json(users));
+        .then(users => res.json(users))
+        .catch(err => next(err))
 })
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
     // const id = Number(req.params.id);
     // const person = persons.find(p => p.id === id);
     // if(!person) return res.status(400).end();
@@ -54,7 +64,7 @@ app.get("/api/persons/:id", (req, res) => {
             if(!user) return res.status(400).json({error: "can't find the user"})
             res.json(user);
         })
-        .catch(err => res.status(500).json({error: err.message}))
+        .catch(err => next(err))
 })
 
 app.post("/api/persons", (req, res) => {
@@ -80,11 +90,10 @@ app.post("/api/persons", (req, res) => {
         return res.status(400).json({error: "name or number fields are missing"})
     }
     const user = new User(req.body);
-    console.log(user);
     user.save().then(newUser => res.status(201).json(newUser));
 })
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res,next) => {
     // const id = Number(req.params.id);
     // const person = persons.find(p => p.id === id);
 
@@ -94,7 +103,7 @@ app.delete("/api/persons/:id", (req, res) => {
 
     User.findByIdAndRemove(req.params.id)
         .then(response => res.status(204).end())
-        .catch(err => res.status(400).json({error: err.message}))
+        .catch(err => next(err))
 })
 
 app.get("/info", (req, res) => {
@@ -103,6 +112,8 @@ app.get("/info", (req, res) => {
     `;
     res.send(response);
 })
+
+app.use(errorHanlder);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
