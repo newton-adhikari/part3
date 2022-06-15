@@ -11,8 +11,8 @@ post http://localhost:3001/api/persons
 content-type: application/json
 
 {
-    "name": "Martin Cooper",
-    "number": "534-9984-382"
+    "name": "Aston Cooper",
+    "number": "121-22334455"
 }
 
 ###

@@ -10,9 +10,21 @@ mongoose.connect(url)
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        minLength: 3
+        minLength: 3,
+        unique: true
     },
-    number: {type: String}
+    number: {
+        type: String,
+        minLength: 8,
+        validate: {
+            validator: function(value) {
+                const sep = value.split("-");
+                if(sep.length !== 2) return false;
+                if(sep[0].length !== 2 && sep[0].length !== 3) return false
+                return true;
+            }
+        }
+    }
 })
 
 userSchema.set("toJSON", {
