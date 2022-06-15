@@ -14,7 +14,10 @@ const errorHanlder = (error, request, response, next) => {
     console.log(error.message);
 
     if(error.name === "CastError") {
-        return response.status(400).send("malformed id");
+        return response.status(400).json({error: error.message});
+    }
+    if(error.name = "ValidationError") {
+        return response.status(400).json({error: error.message})
     }
     next(error);
 }
@@ -22,30 +25,7 @@ const errorHanlder = (error, request, response, next) => {
 app.use(express.static("build"));
 app.use(cors());
 app.use(express.json());
-app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body'))
-
-let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-];
+app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body'));
 
 app.get("/api/persons", (req, res, next) => {
     User.find({})
@@ -67,7 +47,7 @@ app.get("/api/persons/:id", (req, res, next) => {
         .catch(err => next(err))
 })
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     // const id = persons.length > 0
     //     ? Math.max(...persons.map(p => p.id))
     //     : 0
@@ -90,11 +70,14 @@ app.post("/api/persons", (req, res) => {
         return res.status(400).json({error: "name or number fields are missing"})
     }
     const user = new User(req.body);
-    user.save().then(newUser => res.status(201).json(newUser));
+    user.save()
+        .then(newUser => res.status(201).json(newUser))
+        .catch(err => next(err));
 })
 
 app.put("/api/persons/:id", (req, res, next) => {
-    User.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    const {name, number} = req.body;
+    User.findByIdAndUpdate(req.params.id, {name, number}, {new: true, runValidators: true})
         .then(updatedUser => res.json(updatedUser))
         .catch(err => next(err))
 })

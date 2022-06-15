@@ -8,7 +8,10 @@ mongoose.connect(url)
     .catch(err => console.log({error: err.message}))
 
 const userSchema = new mongoose.Schema({
-    name: {type: String},
+    name: {
+        type: String,
+        minLength: 3
+    },
     number: {type: String}
 })
 
